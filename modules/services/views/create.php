@@ -11,9 +11,9 @@
                             <hr>
                             <?php $this->load->view('form'); ?>
                         <?php } else { ?>
-                            <h4 class="no-margin"><?php echo html_escape(_l('invoice_products')) ?></h4>
+                            <h4 class="no-margin"><?php echo html_escape(_l('supplier_offer')) ?></h4>
                             <hr>
-                            <?php $this->load->view('invoic_product_form'); ?>
+                            <?php $this->load->view('offer'); ?>
                         <?php } ?>
                     </div>
                 </div>

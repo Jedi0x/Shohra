@@ -201,3 +201,5 @@ define('APP_MODULES_PATH', FCPATH . 'modules/');
  * Helper libraries path
  */
 define('LIBSPATH', APPPATH . 'libraries/');
+
+defined('PRODUCT_IMAGE_UPLOAD')      OR define('PRODUCT_IMAGE_UPLOAD', 'uploads/products/'); 

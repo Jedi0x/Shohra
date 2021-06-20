@@ -3741,3 +3741,12 @@ $lang['hide_task_checklist_items_completed']          = 'Hide completed items';
 $lang['show_task_checklist_items_completed']          = 'Show completed items %s';
 $lang['task_checklist_assign']                        = 'Assign staff';
 $lang['task_checklist_assigned']                      = 'Assigned to %s';
+
+
+# Junaid Code here
+
+$lang['clients_edit_profile_bank_detail_heading'] = 'Bank Details';
+$lang['clients_edit_profile_account_holder_name'] = 'Bank Account Holder Name';
+$lang['clients_edit_profile_iban'] = 'IBAN Number';
+$lang['clients_edit_profile_bank_location'] = 'Location';
+$lang['clients_edit_profile_save_bank_detail'] = 'Update Bank Details';

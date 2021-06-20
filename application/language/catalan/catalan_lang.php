@@ -3840,3 +3840,12 @@ $lang['hide_task_checklist_items_completed']          = 'Hide completed items';
 $lang['show_task_checklist_items_completed']          = 'Show completed items %s';
 $lang['task_checklist_assign']                        = 'Assign staff';
 $lang['task_checklist_assigned']                      = 'Assigned to %s';
+
+
+# Junaid Code here
+
+$lang['clients_edit_profile_bank_detail_heading'] = 'Detalls del banc';
+$lang['clients_edit_profile_account_holder_name'] = 'Nom del titular del compte bancari';
+$lang['clients_edit_profile_iban'] = 'Número IBAN';
+$lang['clients_edit_profile_bank_location'] = 'Ubicació';
+$lang['clients_edit_profile_save_bank_detail'] = 'Actualitza les dades bancàries';

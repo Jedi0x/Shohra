@@ -112,6 +112,18 @@ function get_customer_profile_tabs()
     return get_instance()->app_tabs->get_customer_profile_tabs();
 }
 
+
+// Junaid code here
+
+/**
+ * Get predefined tabs array, used in customer profile
+ * @return array
+ */
+function get_supplier_profile_tabs()
+{
+    return get_instance()->app_tabs->get_supplier_profile_tabs();
+}
+
 /**
  * Filter only visible tabs selected from the profile
  * @param  array $tabs available tabs
@@ -315,6 +327,92 @@ function app_init_customer_profile_tabs()
         'view'     => 'admin/clients/groups/map',
         'position' => 95,
     ]);
+}
+
+
+// Junaid code here
+
+function app_init_supplier_profile_tabs()
+{
+    $client_id = null;
+
+    $remindersText = _l('client_reminders_tab');
+
+    if ($client = get_client()) {
+        $client_id = $client->userid;
+
+        $total_reminders = total_rows(
+            db_prefix() . 'reminders',
+            [
+                'isnotified' => 0,
+                'staff'      => get_staff_user_id(),
+                'rel_type'   => 'customer',
+                'rel_id'     => $client_id,
+            ]
+        );
+
+        if ($total_reminders > 0) {
+            $remindersText .= ' <span class="badge">' . $total_reminders . '</span>';
+        }
+    }
+
+    $CI = &get_instance();
+
+    $CI->app_tabs->add_supplier_profile_tab('profile', [
+        'name'     => _l('client_add_edit_profile'),
+        'icon'     => 'fa fa-user-circle',
+        'view'     => 'admin/suppliers/groups/profile',
+        'position' => 5,
+    ]);
+
+    $CI->app_tabs->add_supplier_profile_tab('contacts', [
+        'name'     => !is_empty_customer_company($client_id) || empty($client_id) ? _l('customer_contacts') : _l('contact'),
+        'icon'     => 'fa fa-users',
+        'view'     => 'admin/suppliers/groups/contacts',
+        'position' => 10,
+    ]);
+
+    $CI->app_tabs->add_supplier_profile_tab('notes', [
+        'name'     => _l('contracts_notes_tab'),
+        'icon'     => 'fa fa-sticky-note-o',
+        'view'     => 'admin/suppliers/groups/notes',
+        'position' => 15,
+    ]);
+
+    $CI->app_tabs->add_supplier_profile_tab('statement', [
+        'name'     => _l('customer_statement'),
+        'icon'     => 'fa fa-area-chart',
+        'view'     => 'admin/suppliers/groups/statement',
+        'visible'  => has_permission('invoices', '', 'view'),
+        'position' => 20,
+    ]);
+
+    $CI->app_tabs->add_supplier_profile_tab('invoices', [
+        'name'     => _l('client_invoices_tab'),
+        'icon'     => 'fa fa-file-text',
+        'view'     => 'admin/suppliers/groups/invoices',
+        'visible'  => (has_permission('invoices', '', 'view') || has_permission('invoices', '', 'view_own') || (get_option('allow_staff_view_invoices_assigned') == 1 && staff_has_assigned_invoices())),
+        'position' => 25,
+    ]);
+
+    $CI->app_tabs->add_supplier_profile_tab('payments', [
+        'name'     => _l('client_payments_tab'),
+        'icon'     => 'fa fa-line-chart',
+        'view'     => 'admin/suppliers/groups/payments',
+        'visible'  => (has_permission('payments', '', 'view') || has_permission('invoices', '', 'view_own') || (get_option('allow_staff_view_invoices_assigned') == 1 && staff_has_assigned_invoices())),
+        'position' => 30,
+    ]);
+
+   
+
+    $CI->app_tabs->add_supplier_profile_tab('credit_notes', [
+        'name'     => _l('credit_notes'),
+        'icon'     => 'fa fa-sticky-note-o',
+        'view'     => 'admin/suppliers/groups/credit_notes',
+        'visible'  => (has_permission('credit_notes', '', 'view') || has_permission('credit_notes', '', 'view_own')),
+        'position' => 35,
+    ]);
+
 }
 
 /**
@@ -1199,4 +1297,17 @@ function get_contact_language()
     }
 
     return '';
+}
+
+
+// Junaid Code here
+
+function is_supplier($client_id)
+{
+    $client = get_instance()->clients_model->get($client_id);
+    if($client->is_supplier == 1){
+        return true;
+    }else{
+        return false;
+    }
 }

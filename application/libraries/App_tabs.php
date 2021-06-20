@@ -27,6 +27,21 @@ class App_tabs
         return $this->get('customer_profile');
     }
 
+    // Junaid code here
+
+    public function get_supplier_profile_tabs()
+    {
+        return $this->get('supplier_profile');
+    }
+
+    public function add_supplier_profile_tab($slug, $tab)
+    {
+        $this->add($slug, $tab, 'supplier_profile');
+
+        return $this;
+    }
+
+
     public function add_project_tab($slug, $tab)
     {
         $this->add($slug, $tab, 'project');

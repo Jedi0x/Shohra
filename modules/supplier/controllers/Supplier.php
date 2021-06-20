@@ -138,18 +138,26 @@ class Supplier extends AdminController
         // Customer groups
         $data['groups'] = $this->clients_model->get_groups();
 
+
+
+
         if ($id == '') {
             $title = _l('add_new', _l('supplier_lowercase'));
         } else {
             $client                = $this->clients_model->get($id);
             $data['customer_tabs'] = get_customer_profile_tabs();
 
+            // junaid code here
+            $data['supplier_tabs'] = get_supplier_profile_tabs();
+
+           
+
             if (!$client) {
                 show_404();
             }
 
             $data['contacts'] = $this->clients_model->get_contacts($id);
-            $data['tab']      = isset($data['customer_tabs'][$group]) ? $data['customer_tabs'][$group] : null;
+            $data['tab']      = isset($data['supplier_tabs'][$group]) ? $data['supplier_tabs'][$group] : null;
 
             if (!$data['tab']) {
                 show_404();
@@ -643,7 +651,7 @@ class Supplier extends AdminController
             login_as_client($id);
         }
         hooks()->do_action('after_contact_login');
-        redirect(site_url());
+        redirect(site_url('clients'));
     }
 
     public function get_customer_billing_and_shipping_details($id)

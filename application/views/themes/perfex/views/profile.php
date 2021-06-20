@@ -65,6 +65,29 @@
 								<option value="rtl" <?php if($contact->direction == 'rtl'){echo 'selected';} ?>>RTL</option>
 							</select>
 						</div>
+
+						<!-- Junaid code here -->
+
+
+						<div class="form-group profile-phone-group">
+							<label for="snapchat"><?php echo _l('Snapchat Username'); ?></label>
+							<input type="text" class="form-control" name="snapchat" id="snapchat" value="<?php echo $client_info->snapchat; ?>">
+						</div>
+
+						<div class="form-group profile-phone-group">
+							<label for="twitter"><?php echo _l('Twitter Username'); ?></label>
+							<input type="text" class="form-control" name="twitter" id="twitter" value="<?php echo $client_info->twitter; ?>">
+						</div>
+
+						<div class="form-group profile-phone-group">
+							<label for="facebook"><?php echo _l('Facebook Page'); ?></label>
+							<input type="text" class="form-control" name="facebook" id="facebook" value="<?php echo $client_info->facebook; ?>">
+						</div>
+
+						<div class="form-group profile-phone-group">
+							<label for="instagram"><?php echo _l('Instagram Username'); ?></label>
+							<input type="text" class="form-control" name="instagram" id="instagram" value="<?php echo $client_info->instagram; ?>">
+						</div>
 						<?php echo render_custom_fields( 'contacts',get_contact_user_id(),array('show_on_client_portal'=>1)); ?>
 						<?php if(can_contact_view_email_notifications_options()){ ?>
 							<hr />
@@ -159,6 +182,41 @@
 			<?php } ?>
 		</div>
 		<?php hooks()->do_action('after_client_profile_password_form_loaded'); ?>
+	</div>
+
+
+	<!-- Junaid Code Here -->
+	<div class="col-md-4 contact-profile-change-password-section">
+		<div class="panel_s section-heading section-change-password">
+			<div class="panel-body">
+				<h4 class="no-margin section-text"><?php echo _l('clients_edit_profile_bank_detail_heading'); ?></h4>
+			</div>
+		</div>
+		<div class="panel_s">
+			<div class="panel-body">
+				<?php echo form_open('clients/profile'); ?>
+				<?php echo form_hidden('bank_details',true); ?>
+				<div class="form-group">
+					<label for="account_holder_name"><?php echo _l('clients_edit_profile_account_holder_name'); ?></label>
+					<input type="text" class="form-control" name="account_holder_name" id="account_holder_name" value="<?php echo set_value('account_holder_name',$client->account_holder_name); ?>">
+					<?php echo form_error('account_holder_name'); ?>
+				</div>
+				<div class="form-group">
+					<label for="iban_number"><?php echo _l('clients_edit_profile_iban'); ?></label>
+					<input type="text" class="form-control" name="iban_number" id="iban_number" value="<?php echo set_value('iban_number',$client->iban_number); ?>">
+					<?php echo form_error('iban_number'); ?>
+				</div>
+				<div class="form-group">
+					<label for="bank_location"><?php echo _l('clients_edit_profile_bank_location'); ?></label>
+					<textarea rows="3" class="form-control" name="bank_location" id="bank_location"><?php echo set_value('bank_location',$client->bank_location); ?></textarea>
+					<?php echo form_error('bank_location'); ?>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-info btn-block"><?php echo _l('clients_edit_profile_save_bank_detail'); ?></button>
+				</div>
+				<?php echo form_close(); ?>
+			</div>
+		</div>
 	</div>
 
 </div>

@@ -76,6 +76,16 @@ function supplier_content_tab_product_service($client){
         $data['items'] = $CI->items_model->get();
         $data['currencies'] = $CI->currencies_model->get();
         $data['base_currency'] = $CI->currencies_model->get_base_currency();
+        // Junaid code here
+
+        $last = $CI->uri->total_segments();
+        $record_num = $CI->uri->segment($last);
+        $userid = get_client_user_id() ? get_client_user_id() : $record_num;
+        $CI->db->select('*');
+        $CI->db->from(db_prefix() . 'invoice_products');
+        $CI->db->where('client_id',$userid);
+        $CI->db->order_by('id', 'asc');
+        $data['offers'] =  $CI->db->get()->result_array();
         $data['client'] = $client;
         $data['CI'] = $CI;
         if(isset($client)){ 

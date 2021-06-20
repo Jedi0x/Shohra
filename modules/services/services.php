@@ -74,12 +74,12 @@ function subscriptionProducts_menu()
             'position' => 5,
         ]);
 
-        $CI->app_menu->add_sidebar_children_item('products_', [
-            'slug'     => 'services_products_subscription',
-            'name'     => _l('subscription_products'),
-            'href'     => admin_url('services/products/subscription'),
-            'position' => 10,
-        ]);
+        // $CI->app_menu->add_sidebar_children_item('products_', [
+        //     'slug'     => 'services_products_subscription',
+        //     'name'     => _l('subscription_products'),
+        //     'href'     => admin_url('services/products/subscription'),
+        //     'position' => 10,
+        // ]);
 
         $CI->app_menu->add_sidebar_children_item('products_', [
             'slug'     => 'services_products_groups',

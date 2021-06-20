@@ -22,6 +22,10 @@ hooks()->add_action('database_updated', 'app_set_update_message_info');
 hooks()->add_action('before_update_database', 'app_set_pipe_php_permissions');
 hooks()->add_action('admin_init', 'app_init_admin_sidebar_menu_items');
 hooks()->add_action('admin_init', 'app_init_customer_profile_tabs');
+
+// Junaid code here
+
+hooks()->add_action('admin_init', 'app_init_supplier_profile_tabs');
 hooks()->add_action('admin_init', 'app_init_project_tabs');
 hooks()->add_action('admin_init', 'app_init_settings_tabs');
 

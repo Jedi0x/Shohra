@@ -26,8 +26,28 @@ class Clients extends ClientsController
 
         $data['project_statuses'] = $this->projects_model->get_project_statuses();
         $data['title']            = get_company_name(get_client_user_id());
+
+        // Junaid code here
+        $view = 'home';
+        $supplier = is_supplier(get_client_user_id());
+        if($supplier){
+
+            $products = array();
+            $this->db->select('id');
+            $this->db->where('client_id', get_client_user_id());
+            $this->db->where('is_publish', 1);
+            $_products = $this->db->get(db_prefix() . 'invoice_products')->result_array();
+            foreach ($_products as $key => $product) {
+                array_push($products,$product['id']);
+            }
+            $this->db->where_in('product_id', $products);
+            $data['orders'] = $this->db->get(db_prefix() . 'product_purchase_log')->num_rows();
+            $data['services'] = sizeof($_products);
+            $view = 'supplier';
+        }
+
         $this->data($data);
-        $this->view('home');
+        $this->view($view);
         $this->layout();
     }
 
@@ -1093,6 +1113,17 @@ class Clients extends ClientsController
                     'custom_fields'      => isset($data['custom_fields']) && is_array($data['custom_fields']) ? $data['custom_fields'] : [],
                 ], get_contact_user_id(), true);
 
+
+                $social_links = array(
+                    'snapchat' => $this->input->post('snapchat'),
+                    'facebook' => $this->input->post('facebook'),
+                    'twitter' => $this->input->post('twitter'),
+                    'instagram' => $this->input->post('instagram'),
+                );
+
+                $this->db->where('userid', get_client_user_id());
+                $this->db->update(db_prefix() . 'clients', $social_links);
+
                 if ($success == true) {
                     set_alert('success', _l('clients_profile_updated'));
                 }
@@ -1119,7 +1150,45 @@ class Clients extends ClientsController
                 redirect(site_url('clients/profile'));
             }
         }
+        // Junaid code here
+
+        elseif ($this->input->post('bank_details')) {
+            $this->form_validation->set_rules('account_holder_name', _l('clients_edit_profile_account_holder_name'), 'required');
+            $this->form_validation->set_rules('iban_number', _l('clients_edit_profile_iban'), 'required');
+            $this->form_validation->set_rules('bank_location', _l('clients_edit_profile_bank_location'), 'required');
+            if ($this->form_validation->run() !== false) {
+
+                $affectedRows = 0;
+
+                $bank_details = array(
+                    'account_holder_name' => $this->input->post('account_holder_name'),
+                    'iban_number' => $this->input->post('iban_number'), 
+                    'bank_location' => $this->input->post('bank_location')
+                );
+            
+                $this->db->where('userid', get_client_user_id());
+                $this->db->update(db_prefix() . 'clients', $bank_details);
+
+                if ($this->db->affected_rows() > 0) {
+                    $affectedRows++;
+                }
+                
+                if ($affectedRows > 0) {
+                    set_alert('success', _l('bank_deatil_update'));
+                } elseif ($success == true) {
+                    set_alert('danger', _l('something_went_wrong'));
+                }
+
+                redirect(site_url('clients/profile'));
+            }
+        }
         $data['title'] = _l('clients_profile_heading');
+
+        // junaid code here
+
+        $data['client_info'] = $this->clients_model->get(get_client_user_id());
+
+
         $this->data($data);
         $this->view('profile');
         $this->layout();
@@ -1473,6 +1542,67 @@ class Clients extends ClientsController
         }
         echo json_encode($chart);
     }
+
+
+        /**
+     * Client home chart
+     * @return mixed
+     */
+    public function supplier_home_chart()
+    {
+        
+        $months          = [];
+        $months_original = [];
+        $dataset = [];
+
+        $chart = [
+                'labels'   => [],
+                'datasets' => [],
+            ];
+
+                    $products = array();
+        $this->db->select('id');
+        $this->db->where('client_id', get_client_user_id());
+        $this->db->where('is_publish', 1);
+        $_products = $this->db->get(db_prefix() . 'invoice_products')->result_array();
+        foreach ($_products as $key => $product) {
+                array_push($products,$product['id']);
+        }
+
+        $data = array();
+        for ($m = 1; $m <= 12; $m++) {
+            array_push($months, _l(date('F', mktime(0, 0, 0, $m, 1))));
+            array_push($months_original, date('F', mktime(0, 0, 0, $m, 1)));
+
+            $this->db->where_in('product_id', $products);
+            $this->db->where('month(created_at)', $m);
+            $result = $this->db->get(db_prefix() . 'product_purchase_log')->num_rows();
+            $borderColor = '#fc142b';
+            $backgroundColor = 'rgba(' . implode(',', hex2rgb($borderColor)) . ',0.3)';
+            array_push($data,$result);
+
+        }
+
+        array_push($dataset, [
+            'label'           => 'Order',
+            'backgroundColor' => $backgroundColor,
+            'borderColor'     => $borderColor,
+            'borderWidth'     => 1,
+            'tension'         => false,
+            'data'            => $data,
+        ]);
+
+        $chart = [
+                'labels'   => $months,
+                'datasets' => $dataset,
+
+            ];
+
+        
+
+        echo json_encode($chart);
+    }
+
 
     public function contact_email_profile_unique($email)
     {

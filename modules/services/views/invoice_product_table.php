@@ -35,7 +35,7 @@ foreach ($rResult as $aRow) {
 
     $options = '<div class="row-options">';
     if (has_permission('invoices', '', 'edit')) {
-        $options .= '<a href="' . admin_url('services/products/create/invoice/' . $aRow[db_prefix() . 'invoice_products.id']) . '">' . _l('edit') . '</a>';
+        $options .= '<a href="' . admin_url('services/products/offer/invoice/'.$aRow['client_id'].'/'  . $aRow[db_prefix() . 'invoice_products.id']) . '">' . _l('edit') . '</a>';
     }
     if (has_permission('invoices', '', 'delete')) {
         $options .= ' | <a class=" text-danger" href="' . admin_url('services/products/delete/invoice/' . $aRow[db_prefix() . 'invoice_products.id']) . '">' . _l('delete') . '</a>';

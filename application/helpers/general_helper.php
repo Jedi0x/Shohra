@@ -917,3 +917,152 @@ function get_last_upgrade_copy_data()
 
     return false;
 }
+
+
+/** 
+ * Helper function to print array in pre-formated form
+ * 
+ * @param array
+ * @param bool
+ * @return print array
+ */
+function debug($arr, $exit = false)
+{
+  print "<pre>";
+  print_r($arr);
+  print "</pre>";
+  if ($exit)
+    exit;
+}
+
+function clean($string) {
+   $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+   return $string;
+}
+
+function get_product_attachemnt($id)
+{
+    $ci = &get_instance();
+    $ci->db->select("*");
+    $ci->db->where('product_id',$id);
+    return $ci->db->get(db_prefix() . 'invoice_product_attachments')->result_array();
+
+}
+
+
+if (!function_exists('slugify'))
+{
+
+    function slugify($text)
+    {
+    // replace non letter or digits by -
+      $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+
+    // transliterate
+      $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+    // remove unwanted characters
+      $text = preg_replace('~[^-\w]+~', '', $text);
+
+    // trim
+      $text = trim($text, '-');
+
+    // remove duplicate -
+      $text = preg_replace('~-+~', '-', $text);
+
+    // lowercase
+      $text = strtolower($text);
+
+      if (empty($text)) {
+        return 'n-a';
+    }
+
+    return $text;
+}
+}
+if (!function_exists('product_slug'))
+{
+    function product_slug($string)
+    {
+        $slug = slugify($string);
+        $CI =& get_instance();
+        $CI->db->select();
+        $CI->db->from(db_prefix().'invoice_products');
+        $CI->db->like('slug',$string,'after',false);
+        $query = $CI->db->get();
+        $slug_array =  $query->result_array();
+
+        if(count($slug_array) > 0)
+        {
+            $_array = array();
+            foreach ($slug_array as $_slug)
+            {
+                $_array[] = $_slug['slug'];
+            }
+            if(in_array($slug, $_array))
+            {
+                $apend = 0;
+                while(in_array(($slug.'-'.++$apend), $_array));
+                $slug = $slug.'-'.$apend;
+            }
+            return $slug;
+        }
+        else
+        {
+            return $slug;
+        }
+
+    }
+}
+
+
+function get_offer_url($id, $name)
+{
+    $slug = str_replace(' ', '-', strtolower($name));
+    return site_url('services/details/inv/' . $id . '/' . $slug);
+    return null;
+}
+
+function profile_image_url($contact_id, $type = 'small')
+{
+    $url  = base_url('assets/images/user-placeholder.jpg');
+    $CI   = &get_instance();
+    $CI->db->select('profile_image');
+    $CI->db->from(db_prefix() . 'contacts');
+    $CI->db->where('id', $contact_id);
+    $contact = $CI->db->get()->row();
+    $CI->load->library('app_object_cache');
+    $path = $CI->app_object_cache->get('contact-profile-image-path-' . $contact_id);
+    if ($contact && !empty($contact->profile_image)) {
+        $path = 'uploads/client_profile_images/' . $contact_id . '/' . $type . '_' . $contact->profile_image;
+            
+    }
+    
+    if ($path && file_exists($path)) {
+        $url = base_url($path);
+    }
+
+    return $url;
+}
+
+function get_supplier_full_name($contact_id = '')
+{
+    $contact_id == '' ? get_contact_user_id() : $contact_id;
+
+    $CI = &get_instance();
+    $CI->load->library('app_object_cache');
+
+    $contact = $CI->app_object_cache->get('contact-full-name-data-' . $contact_id);
+
+    if (!$contact) {
+        $CI->db->where('id', $contact_id);
+        $contact = $CI->db->select('firstname,lastname')->from(db_prefix() . 'contacts')->get()->row();
+        $CI->app_object_cache->add('contact-full-name-data-' . $contact_id, $contact);
+    }
+
+    if ($contact) {
+        return $contact->firstname . ' ' . $contact->lastname;
+    }
+
+    return '';
+}

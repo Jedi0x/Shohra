@@ -43,6 +43,12 @@
                   </li>
                   <?php hooks()->do_action('after_customer_admins_tab', $client); ?>
                <?php } ?>
+               <!-- Junaid code here -->
+               <li role="presentation">
+                  <a href="#bank_info" aria-controls="bank_info" role="tab" data-toggle="tab">
+                     <?php echo _l('clients_edit_profile_bank_detail_heading'); ?>
+                  </a>
+               </li>
             </ul>
          </div>
       </div>
@@ -149,6 +155,9 @@
                         </select>
                      </div>
                   <?php } ?>
+                  <?php $value = (isset($client) ? $client->instagram : ''); ?>
+                  <?php echo render_input('instagram', 'Instagram', $value); ?>
+                 
                </div>
                <div class="col-md-6">
                   <?php $value = (isset($client) ? $client->address : ''); ?>
@@ -164,6 +173,13 @@
                   $selected = (isset($client) ? $client->country : $customer_default_country);
                   echo render_select('country', $countries, array('country_id', array('short_name')), 'clients_country', $selected, array('data-none-selected-text' => _l('dropdown_non_selected_tex')));
                   ?>
+                  <?php $value = (isset($client) ? $client->facebook : ''); ?>
+                  <?php echo render_input('facebook', 'Facebook', $value); ?>
+                  <?php $value = (isset($client) ? $client->twitter : ''); ?>
+                  <?php echo render_input('twitter', 'Twitter', $value); ?>
+                   <?php $value = (isset($client) ? $client->snapchat : ''); ?>
+                  <?php echo render_input('snapchat', 'Snapchat', $value); ?>
+                  
                 
                </div>
             </div>
@@ -262,6 +278,32 @@
                            </div>
                         </div>
                      <?php } ?>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+
+         <!-- Junaid code here -->
+
+
+         <div role="tabpanel" class="tab-pane" id="bank_info">
+            <div class="row">
+               <div class="col-md-12">
+                  <div class="row">
+                     <div class="col-md-12 dsdas">
+                        <h4 class="no-mtop"><?php echo _l('clients_edit_profile_bank_detail_heading'); ?></h4>
+                        <hr />
+
+                        <?php $value = (isset($client) ? $client->account_holder_name : ''); ?>
+                        <?php echo render_input('account_holder_name', 'clients_edit_profile_account_holder_name', $value,'text'); ?>
+                        <?php $value = (isset($client) ? $client->iban_number : ''); ?>
+                        <?php echo render_input('iban_number', 'clients_edit_profile_iban', $value,'text'); ?>
+                        <?php $value = (isset($client) ? $client->bank_location : ''); ?>
+                        <?php echo render_textarea('bank_location', 'clients_edit_profile_bank_location', $value); ?>
+
+                     </div>
+         
                   </div>
                </div>
             </div>
