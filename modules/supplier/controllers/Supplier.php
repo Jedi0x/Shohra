@@ -8,6 +8,9 @@ class Supplier extends AdminController
     {
         parent::__construct();
         $this->load->model('invoice_items_model');
+        $this->load->model('taxes_model');
+        $this->load->model('currencies_model');
+        $this->load->model('service_model');
         // $this->app_scripts->add('jquery-form-js', 'https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js');
     }
     /* List all clients */
@@ -138,9 +141,6 @@ class Supplier extends AdminController
         // Customer groups
         $data['groups'] = $this->clients_model->get_groups();
 
-
-
-
         if ($id == '') {
             $title = _l('add_new', _l('supplier_lowercase'));
         } else {
@@ -150,7 +150,7 @@ class Supplier extends AdminController
             // junaid code here
             $data['supplier_tabs'] = get_supplier_profile_tabs();
 
-           
+       
 
             if (!$client) {
                 show_404();
@@ -1112,7 +1112,7 @@ class Supplier extends AdminController
         if (is_array($response) && isset($response['referenced'])) {
             set_alert('warning', _l('is_referenced', _l('invoice_item_lowercase')));
         } elseif ($response == true) {
-            set_alert('success', _l('deleted', _l('invoice_item')));
+            set_alert('success', _l('deleted', _l('service')));
         } else {
             set_alert('warning', _l('problem_deleting', _l('invoice_item_lowercase')));
         }
@@ -1201,5 +1201,209 @@ class Supplier extends AdminController
             echo json_encode($item);
         }
       }
+
+
+    // Junaid code here
+
+    public function manage_services($client, $service = false)
+    {
+
+        $data['taxes']        = $this->taxes_model->get();
+        $data['currencies'] = $this->currencies_model->get();
+        $data['base_currency'] = $this->currencies_model->get_base_currency();
+        $data['header'] = 'supplier_new_service';
+        $data['clientid'] = $client;
+
+        if($service){
+            $data['header'] = 'supplier_edit_service';
+            $data['product'] = $this->service_model->get($service);
+        }
+
+        if($this->input->post()){
+            $publish = 0;
+            $featured = 0;
+            $iframe = NULL;
+            if($this->input->post('is_publish') == 'on'){
+                $publish = 1;
+            }
+
+            if($this->input->post('is_featured') == 'on'){
+                $featured = 1;
+            }
+
+            
+
+
+            if(!empty($this->input->post('offer_embed_link'))){
+                $iframe = html_entity_decode($this->input->post('offer_embed_link'));
+                $height = 190;
+                $width = 255;
+                $iframe = preg_replace('/height="(.*?)"/i', 'height="' . $height .'"', $iframe);
+                $iframe = preg_replace('/width="(.*?)"/i', 'width="' . $width .'"', $iframe);
+            }
+            
+
+            $long_description = html_purify($this->input->post('long_description', false));
+            $long_description = remove_emojis($long_description);
+            $long_description = nl2br($long_description);
+
+
+            $service = [
+                'rel_type'              => 'supplier_offer',
+                'description'           => nl2br($this->input->post('name')),
+                'long_description'      => $long_description,
+                'rate'                  => $this->input->post('price'),
+                'tax'                   => NULL,
+                'tax2'                  => NULL,
+                'userid'                => $client,
+                'unit'                  => 1,
+                'offer_embed_link'      => $iframe,
+                'is_publish'            => $publish,
+                'is_featured'           => $featured,
+                'offer_time'            => $this->input->post('offer_time'),
+                'offer_video_number'    => $this->input->post('offer_video_number')
+            ];
+
+            if (!is_dir('uploads/services')) {
+                mkdir('./uploads/services/', 0777, TRUE);
+            }
+
+            $attachments = array();
+            if(isset($_FILES['attachments']) && !empty($_FILES['attachments'])){
+                $files = $_FILES['attachments'];
+                $config = array(
+                    'upload_path'   => SERVICE_IMAGE_UPLOAD,
+                    'allowed_types' => '*',
+                    'max_size' => '1000000000',
+                    'encrypt_name' => TRUE,
+
+                );
+
+                $this->load->library('upload', $config);
+                foreach ($files['name'] as $key => $image) {
+
+                    $_FILES['images[]']['name']= $files['name'][$key];
+                    $_FILES['images[]']['type']= $files['type'][$key];
+                    $_FILES['images[]']['tmp_name']= $files['tmp_name'][$key];
+                    $_FILES['images[]']['error']= $files['error'][$key];
+                    $_FILES['images[]']['size']= $files['size'][$key];
+
+                    if(!empty($image)){
+                        $this->upload->initialize($config);
+                        if ($this->upload->do_upload('images[]')) {
+                            $result = $this->upload->data();
+                            $attachments[] = $result['file_name'];
+                        } 
+                    }
+                }
+            }
+
+            if ($this->input->post('id')) {
+
+
+                $update = $this->service_model->update($this->input->post('id'), $service);
+                if ($update) {
+
+                    if(!empty($attachments)){
+                        foreach ($attachments as $k => $attachment) {
+                            $attachments_data = array('item_id' => $this->input->post('id'), 'attachment' => $attachment );
+                            $this->db->insert(db_prefix().'item_attachments', $attachments_data);
+                        }
+
+                    }
+                    
+                    set_alert('success', _l('updated_successfully', _l('service')));
+                }
+            } else if ($this->input->post()) {
+
+                $service['slug'] = product_slug($this->input->post('name'));
+                $insert_id = $this->service_model->create($service);
+                if ($insert_id) {
+
+                    if(!empty($attachments)){
+                        foreach ($attachments as $k => $attachment) {
+                            $attachments_data = array('item_id' => $insert_id, 'attachment' => $attachment );
+                            $this->db->insert(db_prefix().'item_attachments', $attachments_data);
+                        }
+
+                    }
+                    set_alert('success', _l('added_successfully', _l('service')));
+                }
+            }
+
+            redirect(admin_url('supplier/client/' . $client));
+
+
+
+
+        }
+        $this->load->view('admin/suppliers/manage_services', $data);
+    }
+
+
+    public function change_publish_status($id, $status)
+    {
+        
+        if ($this->input->is_ajax_request()) {
+             $this->service_model->change_publish_status($id, $status);
+        }
+        
+    }
+
+
+    public function change_featured_status($id, $status)
+    {
+        
+        if ($this->input->is_ajax_request()) {
+            $this->service_model->change_featured_status($id, $status);
+        }
+        
+    }
+
+
+    // Junaid code here
+
+    public function delete_service_attachment($attachment='')
+    {
+        $this->db->where('attachment', $attachment);
+        $this->db->delete(db_prefix() . 'item_attachments');
+        unlink(PRODUCT_IMAGE_UPLOAD.$attachment);
+     
+        if ($this->db->affected_rows() > 0) {
+            set_alert('success', _l('attachment_deleted'));
+            redirect($_SERVER['HTTP_REFERER']);
+        }
+        
+        
+    }
+
+
+    public function service_view()
+    {
+        $service = $_POST['service_id'];
+        $data['product'] = $this->service_model->get($service);
+        echo $this->load->view('admin/suppliers/view_service', $data, true);
+    }
+
+    public function orders()
+    {
+        $data['title'] = _l('orders');
+        $this->load->view('manage', $data);
+    }
+
+
+    public function order_table()
+    {
+        $this->app->get_table_data(module_views_path('supplier', 'table'));
+    }
+
+
+    public function disconnect_fb($client)
+    {
+        $this->db->where('userid', $client);
+        $this->db->update(db_prefix() . 'clients', array('fb_access_token' => NULL, 'fb_username' => NULL));
+        set_alert('success','Facebook Business Account Disconnected.');
+        redirect($_SERVER['HTTP_REFERER']);
+    }
 
 }

@@ -622,7 +622,7 @@ class Clients extends AdminController
             login_as_client($id);
         }
         hooks()->do_action('after_contact_login');
-        redirect(site_url());
+        redirect(site_url('clients'));
     }
 
     public function get_customer_billing_and_shipping_details($id)

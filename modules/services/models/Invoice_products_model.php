@@ -70,10 +70,6 @@ class Invoice_products_model extends App_Model
         $this->db->where('id', $id);
         $this->db->delete($this->table);
         if ($this->db->affected_rows() > 0) {
-            // Junaid code here
-
-            $this->db->where('product_id', $id);
-            $this->db->delete(db_prefix().'invoice_product_attachments');
             return true;
         }
         return $this->db->error();
@@ -105,7 +101,6 @@ class Invoice_products_model extends App_Model
         if($category){
             $this->db->where('group', $category);
         }
-         $this->db->where('is_publish', 1);
 
         return $this->db->get($this->table)->result();
     }

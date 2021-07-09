@@ -13,18 +13,6 @@
             }
         });
 
-
-        appValidateForm('#offerProductsForm', {
-            name: 'required',
-            price: 'required',
-            description: 'required',
-            currency: 'required',
-            attachments: 'required',
-            clientid: 'required',
-            time: 'required',
-            number: 'required'
-        });
-
         $('#stripeProductsForm').on('dirty.areYouSure', function() {
             $('#prorateWrapper').removeClass('hide');
         });

@@ -4,7 +4,34 @@ $group = isset($group) ? $group : '';
 $showQuantity = get_option('show_product_quantity_field') == 1 ? true : false;
 ?>
 <h3 id="greeting" class="no-mtop"></h3>
+<div class="panel_s mtop25">
+    <div class="panel-body">
+        <ul class="nav nav-tabs no-margin " role="tablist">
+            <li role="presentation" class="<?= (!$group) ? 'active' : null ?>">
+                <a data-group="all_products" href="<?php echo site_url('services/'); ?>" role="tab"><i class="fa fa-th" aria-hidden="true"></i> <?php echo _l('all'); ?></a>
+            </li>
 
+            <?php if (get_option('enable_subscription_products_view') == 1) { ?>
+                <li role="presentation" class="subscription_products <?= ($group && $group == 'subscriptions') ? 'active' : '' ?>">
+                    <a data-group="subscription_products" href="<?php echo site_url('services/category/subscriptions'); ?>" role="tab"> <?php echo _l('subscriptions'); ?></a>
+                </li>
+            <?php } ?>
+
+            <?php if (get_option('enable_invoice_products_view') == 1) { ?>
+                <li role="presentation" class="invoice_products <?= (isset($group) && $group == 'invoices') ? 'active' : '' ?>">
+                    <a data-group="invoice_products" href="<?php echo site_url('services/category/invoices'); ?>" role="tab"> <?php echo _l('invoice_product'); ?></a>
+                </li>
+            <?php } ?>
+
+            <?php foreach ($groups as $category) { ?>
+                <?php $slug = str_replace(' ', '-', strtolower($category->name)); ?>
+                <li role="presentation" class="project_tab_activity <?= (($category->id == $group)) ? 'active' : '' ?>">
+                    <a data-group="<?= $slug ?>" href="<?php echo site_url('services/category/' . $category->id . '/' . $slug); ?>" role="tab"><?php echo $category->name; ?></a>
+                </li>
+            <?php } ?>
+        </ul>
+    </div>
+</div>
 <div class="panel_s mtop25">
     <div class="panel-body">
         <?php foreach ($products as $product) { ?>

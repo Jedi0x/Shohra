@@ -944,8 +944,8 @@ function get_product_attachemnt($id)
 {
     $ci = &get_instance();
     $ci->db->select("*");
-    $ci->db->where('product_id',$id);
-    return $ci->db->get(db_prefix() . 'invoice_product_attachments')->result_array();
+    $ci->db->where('item_id',$id);
+    return $ci->db->get(db_prefix() . 'item_attachments')->result_array();
 
 }
 
@@ -987,11 +987,10 @@ if (!function_exists('product_slug'))
         $slug = slugify($string);
         $CI =& get_instance();
         $CI->db->select();
-        $CI->db->from(db_prefix().'invoice_products');
-        $CI->db->like('slug',$string,'after',false);
+        $CI->db->from(db_prefix().'items');
+        $CI->db->like('slug',$slug,'both');
         $query = $CI->db->get();
         $slug_array =  $query->result_array();
-
         if(count($slug_array) > 0)
         {
             $_array = array();
@@ -1065,4 +1064,149 @@ function get_supplier_full_name($contact_id = '')
     }
 
     return '';
+}
+
+
+function thousandsCurrencyFormat($num) {
+
+  if($num>1000) {
+
+        $x = round($num);
+        $x_number_format = number_format($x);
+        $x_array = explode(',', $x_number_format);
+        $x_parts = array('K', 'M', 'B', 'T');
+        $x_count_parts = count($x_array) - 1;
+        $x_display = $x;
+        $x_display = $x_array[0] . ((int) $x_array[1][0] !== 0 ? '.' . $x_array[1][0] : '');
+        $x_display .= $x_parts[$x_count_parts - 1];
+
+        return $x_display;
+
+  }
+
+  return $num;
+}
+
+function service_invoice_data($data, $client)
+{
+    $CI = &get_instance();
+    $CI->load->model('clients_model');
+    $client                       = $CI->clients_model->get($client);
+    $new_invoice_data             = [];
+    $new_invoice_data['clientid'] = $client;
+    $new_invoice_data['number']   = get_option('next_invoice_number');
+    $new_invoice_data['date']     = _d(date('Y-m-d'));
+    $new_invoice_data['duedate']  = _d(date('Y-m-d', strtotime('+' . get_option('invoice_due_after') . ' DAY', strtotime(date('Y-m-d')))));
+
+    $new_invoice_data['show_quantity_as'] = 1;
+    $new_invoice_data['currency']         = 1;
+
+    $new_invoice_data['subtotal']         = floatval($data->rate) * 1;
+    $new_invoice_data['adjustment']       = 0;
+    $new_invoice_data['discount_percent'] = 0;
+    $new_invoice_data['discount_total']   = 0;
+    $new_invoice_data['discount_type']    = 0;
+
+    $new_invoice_data['terms']      = clear_textarea_breaks(get_option('predefined_terms_invoice'));
+    $new_invoice_data['sale_agent'] = 1;
+
+    $new_invoice_data['billing_street']           = clear_textarea_breaks($client->billing_street);
+    $new_invoice_data['billing_city']             = $client->billing_city;
+    $new_invoice_data['billing_state']            = $client->billing_state;
+    $new_invoice_data['billing_zip']              = $client->billing_zip;
+    $new_invoice_data['billing_country']          = $client->billing_country;
+    $new_invoice_data['shipping_street']          = clear_textarea_breaks($client->shipping_street);
+    $new_invoice_data['shipping_city']            = $client->shipping_city;
+    $new_invoice_data['shipping_state']           = $client->shipping_state;
+    $new_invoice_data['shipping_zip']             = $client->shipping_zip;
+    $new_invoice_data['shipping_country']         = $client->shipping_country;
+    $new_invoice_data['show_shipping_on_invoice'] = 0;
+    $new_invoice_data['status']                   = 1;
+
+    if (!empty($client->shipping_street)) {
+        $new_invoice_data['show_shipping_on_invoice'] = 1;
+        $new_invoice_data['include_shipping']         = 1;
+    }
+
+    $new_invoice_data['clientnote']            = clear_textarea_breaks(get_option('predefined_clientnote_invoice'));
+    $new_invoice_data['adminnote']             = 'created from prodducts page by client';
+    $new_invoice_data['allowed_payment_modes'] = service_default_payment_gateways();
+
+    $new_invoice_data['newitems'] = [];
+    $key                          = 1;
+    $items                        = 1;
+
+    $new_invoice_data['newitems'][$key]['rate']             = $data->rate;
+    $new_invoice_data['newitems'][$key]['description']      = trim($data->description);
+    $new_invoice_data['newitems'][$key]['long_description'] = $data->long_description;
+    $new_invoice_data['newitems'][$key]['qty']              = 1;
+    $new_invoice_data['newitems'][$key]['unit']             = 1;
+    $new_invoice_data['newitems'][$key]['order']            = $key;
+    $new_invoice_data['newitems'][$key]['taxname']          = [];
+
+    
+
+    $total_tax         = 0;
+    $taxes             = [];
+    $_calculated_taxes = [];
+
+    foreach ($new_invoice_data['newitems'] as $item) {
+        if (isset($items['taxes']) && count($items['taxes']) > 0) {
+            foreach ($items['taxes'] as $tax) {
+                $tax = explode('|', $tax);
+
+                $calc_tax     = 0;
+                $tax_not_calc = false;
+                if (!in_array($tax[0], $_calculated_taxes)) {
+                    array_push($_calculated_taxes, $tax[0]);
+                    $tax_not_calc = true;
+                }
+
+                if ($tax_not_calc == true) {
+                    $taxes[$tax[0]]          = [];
+                    $taxes[$tax[0]]['total'] = [];
+                    array_push($taxes[$tax[0]]['total'], (($item['qty'] * $item['rate']) / 100 * $tax[1]));
+                    $taxes[$tax[0]]['tax_name'] = $tax[0];
+                    $taxes[$tax[0]][1]          = $tax[1];
+                } else {
+                    array_push($taxes[$tax[0]]['total'], (($item['qty'] * $item['rate']) / 100 * $tax[1]));
+                }
+            }
+        }
+    }
+
+    foreach ($taxes as $tax) {
+        $total = array_sum($tax['total']);
+        if ($new_invoice_data['discount_percent'] != 0 && $data['discount_type'] == 'before_tax') {
+            $total_tax_calculated = ($total * $new_invoice_data['discount_percent']) / 100;
+            $total                = ($total - $total_tax_calculated);
+        } elseif ($new_invoice_data['discount_total'] != 0 && $data['discount_type'] == 'before_tax') {
+            $t     = ($new_invoice_data['discount_total'] / $new_invoice_data['subtotal']) * 100;
+            $total = ($total - $total * $t / 100);
+        }
+        $total_tax += $total;
+    }
+
+    $new_invoice_data['total'] = $new_invoice_data['subtotal'] + $total_tax;
+
+    $new_invoice_data = hooks()->apply_filters('whm_invoice_data', $new_invoice_data);
+
+    return $new_invoice_data;
+}
+
+function service_default_payment_gateways()
+{
+    $CI = &get_instance();
+    $CI->load->model('payment_modes_model');
+    $CI->load->model('payments_model');
+    $payment_modes = $CI->payment_modes_model->get('', [
+        'expenses_only !=' => 1,
+    ]);
+    $default = [];
+    foreach ($payment_modes as $mode) {
+        if ($mode['selected_by_default'] == 1 && $mode['active'] == 1) {
+            $default[] = $mode['id'];
+        }
+    }
+    return $default;
 }

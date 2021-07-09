@@ -1142,6 +1142,11 @@ function get_upload_path_by_type($type)
         case 'estimate_request':
         $path = NEWSFEED_FOLDER;
 
+        //Junaid code here
+        break;
+        case 'service':
+        $path = SERVICE_IMAGE_UPLOAD;
+
         break;
     }
 

@@ -25,6 +25,7 @@ class Clients extends ClientsController
         $data['payments_years'] = $this->reports_model->get_distinct_customer_invoices_years();
 
         $data['project_statuses'] = $this->projects_model->get_project_statuses();
+
         $data['title']            = get_company_name(get_client_user_id());
 
         // Junaid code here
@@ -32,19 +33,34 @@ class Clients extends ClientsController
         $supplier = is_supplier(get_client_user_id());
         if($supplier){
 
-            $products = array();
-            $this->db->select('id');
-            $this->db->where('client_id', get_client_user_id());
-            $this->db->where('is_publish', 1);
-            $_products = $this->db->get(db_prefix() . 'invoice_products')->result_array();
-            foreach ($_products as $key => $product) {
-                array_push($products,$product['id']);
+            $offers = array();
+            $this->db->where('rel_type', 'supplier_offer');
+            $this->db->where('userid', get_client_user_id());
+            $offer =  $this->db->get(db_prefix() . 'items')->result_array();
+
+            foreach ($offer as $k => $v) {
+                array_push($offers,$v['id']);
             }
-            $this->db->where_in('product_id', $products);
-            $data['orders'] = $this->db->get(db_prefix() . 'product_purchase_log')->num_rows();
-            $data['services'] = sizeof($_products);
+
+            $this->db->select('*, ' . db_prefix() . 'currencies.id as currencyid, ' . db_prefix() . 'invoices.id as id, ' . db_prefix() . 'currencies.name as currency_name');
+            $this->db->from(db_prefix() . 'offer_order');
+            $this->db->join(db_prefix() . 'invoices', '' . db_prefix() . 'invoices.id = ' . db_prefix() . 'offer_order.invoice_id', 'left');
+            $this->db->join(db_prefix() . 'currencies', '' . db_prefix() . 'currencies.id = ' . db_prefix() . 'invoices.currency', 'left');
+            $this->db->where_in(db_prefix() . 'offer_order.offer_id',$offers);
+            $this->db->order_by('number,YEAR(date)', 'desc');
+            $offers  = $this->db->get()->result_array();
+
+            $data['orders'] = sizeof($offers);
+            $data['services'] = sizeof($offer);
+
+
+
+            $this->load->model('credit_notes_model');
+
+            $data['credits_available']     = $this->credit_notes_model->total_remaining_credits_by_customer(get_client_user_id());
             $view = 'supplier';
         }
+
 
         $this->data($data);
         $this->view($view);
@@ -1113,20 +1129,22 @@ class Clients extends ClientsController
                     'custom_fields'      => isset($data['custom_fields']) && is_array($data['custom_fields']) ? $data['custom_fields'] : [],
                 ], get_contact_user_id(), true);
 
+                if ($success == true) {
+                    set_alert('success', _l('clients_profile_updated'));
+                }
 
-                $social_links = array(
-                    'snapchat' => $this->input->post('snapchat'),
-                    'facebook' => $this->input->post('facebook'),
-                    'twitter' => $this->input->post('twitter'),
-                    'instagram' => $this->input->post('instagram'),
-                );
+
+                // Junaid code here
+
+
+                $social_links = array('fb_username' => $data['fb_username'], 'instagram_username' => $data['instagram_username'], 'snapchat_username' => $data['snapchat_username'], 'twitter_username' => $data['twitter_username']);
 
                 $this->db->where('userid', get_client_user_id());
                 $this->db->update(db_prefix() . 'clients', $social_links);
 
-                if ($success == true) {
-                    set_alert('success', _l('clients_profile_updated'));
-                }
+                set_alert('success', _l('clients_profile_updated'));
+
+
 
                 redirect(site_url('clients/profile'));
             }
@@ -1150,7 +1168,6 @@ class Clients extends ClientsController
                 redirect(site_url('clients/profile'));
             }
         }
-        // Junaid code here
 
         elseif ($this->input->post('bank_details')) {
             $this->form_validation->set_rules('account_holder_name', _l('clients_edit_profile_account_holder_name'), 'required');
@@ -1182,13 +1199,12 @@ class Clients extends ClientsController
                 redirect(site_url('clients/profile'));
             }
         }
-        $data['title'] = _l('clients_profile_heading');
 
-        // junaid code here
+         // junaid code here
 
         $data['client_info'] = $this->clients_model->get(get_client_user_id());
 
-
+        $data['title'] = _l('clients_profile_heading');
         $this->data($data);
         $this->view('profile');
         $this->layout();
@@ -1543,11 +1559,13 @@ class Clients extends ClientsController
         echo json_encode($chart);
     }
 
+    public function contact_email_profile_unique($email)
+    {
+        return total_rows(db_prefix() . 'contacts', 'id !=' . get_contact_user_id() . ' AND email="' . get_instance()->db->escape_str($email) . '"') > 0 ? false : true;
+    }
 
-        /**
-     * Client home chart
-     * @return mixed
-     */
+
+    // Junaid code here
     public function supplier_home_chart()
     {
         
@@ -1560,23 +1578,25 @@ class Clients extends ClientsController
                 'datasets' => [],
             ];
 
-                    $products = array();
-        $this->db->select('id');
-        $this->db->where('client_id', get_client_user_id());
-        $this->db->where('is_publish', 1);
-        $_products = $this->db->get(db_prefix() . 'invoice_products')->result_array();
-        foreach ($_products as $key => $product) {
-                array_push($products,$product['id']);
-        }
+        $products = array();
+            $this->db->where('rel_type', 'supplier_offer');
+            $this->db->where('userid', get_client_user_id());
+            $offer =  $this->db->get(db_prefix() . 'items')->result_array();
+
+            foreach ($offer as $k => $v) {
+                array_push($products,$v['id']);
+            }
+
+           
 
         $data = array();
         for ($m = 1; $m <= 12; $m++) {
             array_push($months, _l(date('F', mktime(0, 0, 0, $m, 1))));
             array_push($months_original, date('F', mktime(0, 0, 0, $m, 1)));
 
-            $this->db->where_in('product_id', $products);
+            $this->db->where_in('offer_id', $products);
             $this->db->where('month(created_at)', $m);
-            $result = $this->db->get(db_prefix() . 'product_purchase_log')->num_rows();
+            $result = $this->db->get(db_prefix() . 'offer_order')->num_rows();
             $borderColor = '#fc142b';
             $backgroundColor = 'rgba(' . implode(',', hex2rgb($borderColor)) . ',0.3)';
             array_push($data,$result);
@@ -1603,9 +1623,4 @@ class Clients extends ClientsController
         echo json_encode($chart);
     }
 
-
-    public function contact_email_profile_unique($email)
-    {
-        return total_rows(db_prefix() . 'contacts', 'id !=' . get_contact_user_id() . ' AND email="' . get_instance()->db->escape_str($email) . '"') > 0 ? false : true;
-    }
 }

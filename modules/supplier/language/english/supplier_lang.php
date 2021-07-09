@@ -101,5 +101,5 @@ $lang['suppliers']                                  = 'Suppliers';
 // $lang['import_customers']            = 'Import Supplier';
 $lang['preffered_supplier']				="Preferred Supplier";
 $lang['not_preffered_supplier']				="Not Preferred Supplier";
-$lang['product_and_service']				="Offers";
+$lang['product_and_service']				="Products and services";
 $lang['suppliers_summary_total']				="Total Suppliers";

@@ -43,7 +43,7 @@ function supplier_tab_product_services($clients){
     ?>
     <li role="presentation">
         <a href="#product_services" aria-controls="product_services" role="tab" data-toggle="tab">
-        <?php echo _l('product_and_service'); ?>
+        <?php echo _l('supplier_product_and_service'); ?>
         </a>
     </li>
 <?php }
@@ -76,16 +76,6 @@ function supplier_content_tab_product_service($client){
         $data['items'] = $CI->items_model->get();
         $data['currencies'] = $CI->currencies_model->get();
         $data['base_currency'] = $CI->currencies_model->get_base_currency();
-        // Junaid code here
-
-        $last = $CI->uri->total_segments();
-        $record_num = $CI->uri->segment($last);
-        $userid = get_client_user_id() ? get_client_user_id() : $record_num;
-        $CI->db->select('*');
-        $CI->db->from(db_prefix() . 'invoice_products');
-        $CI->db->where('client_id',$userid);
-        $CI->db->order_by('id', 'asc');
-        $data['offers'] =  $CI->db->get()->result_array();
         $data['client'] = $client;
         $data['CI'] = $CI;
         if(isset($client)){ 
@@ -128,14 +118,20 @@ function supplier_permissions() {
 }
 function supplier_clients_area_menu_items()
 {   
-
+   
     // Show menu item only if client is logged in
-    if (is_client_logged_in()) {
+    if (is_client_logged_in() && has_contact_permission('items')) {
 
         add_theme_menu_item('product-services-in-item-id', [
-                    'name'     => _l('product_and_service'),
+                    'name'     => _l('supplier_product_and_service'),
                     'href'     => site_url('supplier/product_services/'),
                     'position' => 21,
+        ]);
+
+        add_theme_menu_item('supplier-orders', [
+                    'name'     => _l('orders'),
+                    'href'     => site_url('supplier/product_services/orders'),
+                    'position' => 22,
         ]);
     }
 }
@@ -182,6 +178,14 @@ function supplier_module_init_menu_items() {
             'position' => 5,
             'icon'     => 'fa fa-user',
             'href'     => admin_url('supplier')
+        ]);
+
+        $CI->app_menu->add_sidebar_menu_item('orders', [
+            'slug'     => 'orders',
+            'name'     => _l('orders'),
+            'position' => 5,
+            'icon'     => 'fa fa-user',
+            'href'     => admin_url('supplier/orders')
         ]);
         $CI->app_tabs->add_customer_profile_tab('map', [
         'name'     => _l('customer_map'),

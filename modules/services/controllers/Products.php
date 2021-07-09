@@ -108,38 +108,6 @@ class Products extends AdminController
         }
     }
 
-    // Junaid code here
-
-
-    public function offer($type, $client = false, $id = false)  
-    {
-        if (!has_permission('subscriptions', '', 'create')) {
-            access_denied('Subscriptions Create');
-        }
-
-        $data['title'] = _l('add_new', _l('product'));
-        $data['taxes']      = $this->taxes_model->get();
-        $data['currencies'] = $this->currencies_model->get();
-        $data['groups']     = json_decode(json_encode($this->spm->get_group()), true);
-
-
-        if ($id) {
-            $data['product'] = $this->ipm->get($id);
-
-        }
-
-        if($client){
-            $data['client'] = $client;
-        }
-        $data['customers_groups'] = $this->clients_model->get_groups();
-        $data['customers'] = $this->clients_model->get();
-
-        $data['bodyclass']  = 'invoice';
-        $data['invoice_product']  = true;
-        $this->load->view('create', $data);
-        
-    }
-
     /**
      * Adds or updates product
      */
@@ -153,7 +121,6 @@ class Products extends AdminController
             $plan = $this->stripe_subscriptions->get_plan($this->input->post('stripe_plan_id'));
             $data = [
                 'name'                => $this->input->post('name'),
-
                 'description'         => nl2br($this->input->post('description')),
                 'price'               => $plan->amount,
                 'period'              => $plan->interval,
@@ -193,20 +160,6 @@ class Products extends AdminController
             redirect(admin_url('services/products/subscription'));
         } elseif ($type == 'invoice') {
 
-            if($this->input->post('is_publish') == 'on'){
-                $publish = 1;
-            }else{
-                $publish = 0;
-            }
-
-            $iframe = html_entity_decode($this->input->post('video'));
-            $height = 190;
-            $width = 255;
-
-
-            $iframe = preg_replace('/height="(.*?)"/i', 'height="' . $height .'"', $iframe);
-            $iframe = preg_replace('/width="(.*?)"/i', 'width="' . $width .'"', $iframe);
-
             $tax = implode(',', (array) $this->input->post('tax'));
             $data = [
                 'name'                  => $this->input->post('name'),
@@ -221,13 +174,7 @@ class Products extends AdminController
                 'interval_type'         => $this->input->post('interval_type'),
                 // 'cycle'                 =>$this->input->post('name'),
                 'created_from'          => get_staff_user_id(),
-                'video'                 => $iframe,
-                'is_publish'            => $publish,
-                'slug'                  => product_slug($this->input->post('name')),
-                'video_time'            => $this->input->post('video_time'),
-                'video_number'          => $this->input->post('video_number')
             ];
-
 
             if ($this->input->post('related_to') ==  'customer_groups') {
                 $data['customer_group'] = $this->input->post('customer_group');
@@ -240,74 +187,18 @@ class Products extends AdminController
                 $data['customer_group'] = null;
             }
 
-            // Junaid code here
-
-            if (!is_dir('uploads/products')) {
-                mkdir('./uploads/products/', 0777, TRUE);
-            }
-
-            $attachments = array();
-            if(isset($_FILES['attachments']) && !empty($_FILES['attachments'])){
-                $files = $_FILES['attachments'];
-                $config = array(
-                    'upload_path'   => PRODUCT_IMAGE_UPLOAD,
-                    'allowed_types' => '*',
-                    'max_size' => '1000000000',
-                    'encrypt_name' => TRUE,
-
-                );
-
-                $this->load->library('upload', $config);
-                foreach ($files['name'] as $key => $image) {
-
-                    $_FILES['images[]']['name']= $files['name'][$key];
-                    $_FILES['images[]']['type']= $files['type'][$key];
-                    $_FILES['images[]']['tmp_name']= $files['tmp_name'][$key];
-                    $_FILES['images[]']['error']= $files['error'][$key];
-                    $_FILES['images[]']['size']= $files['size'][$key];
-
-                    if(!empty($image)){
-                        $this->upload->initialize($config);
-                        if ($this->upload->do_upload('images[]')) {
-                            $result = $this->upload->data();
-                            $attachments[] = $result['file_name'];
-                        } 
-                    }
-                }
-            }
-
             if ($this->input->post('id')) {
-
-
                 $update = $this->ipm->update($this->input->post('id'), $data);
                 if ($update) {
-
-                    if(!empty($attachments)){
-                        foreach ($attachments as $k => $attachment) {
-                            $attachments_data = array('product_id' => $this->input->post('id'), 'attachment' => $attachment );
-                            $this->db->insert(db_prefix().'invoice_product_attachments', $attachments_data);
-                        }
-
-                    }
-                    
                     set_alert('success', _l('updated_successfully'));
                 }
             } else if ($this->input->post()) {
-
                 $insert_id = $this->ipm->create($data);
                 if ($insert_id) {
-
-                    if(!empty($attachments)){
-                        foreach ($attachments as $k => $attachment) {
-                            $attachments_data = array('product_id' => $insert_id, 'attachment' => $attachment );
-                            $this->db->insert(db_prefix().'invoice_product_attachments', $attachments_data);
-                        }
-
-                    }
                     set_alert('success', _l('added_successfully'));
                 }
             }
-            redirect(base_url('services/products/invoice'));
+            redirect(admin_url('services/products/invoice'));
         }
     }
     /**
@@ -421,21 +312,5 @@ class Products extends AdminController
             set_alert('success', 'success');
         }
         redirect(site_url('services/products/groups'));
-    }
-
-    // Junaid code here
-
-    public function delete_attachment($attachment='')
-    {
-        $this->db->where('attachment', $attachment);
-        $this->db->delete(db_prefix() . 'invoice_product_attachments');
-        unlink(PRODUCT_IMAGE_UPLOAD.$attachment);
-     
-        if ($this->db->affected_rows() > 0) {
-            set_alert('success', _l('attachment_deleted'));
-            redirect($_SERVER['HTTP_REFERER']);
-        }
-        
-        
     }
 }

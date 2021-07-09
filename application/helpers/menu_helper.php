@@ -13,6 +13,8 @@ function app_init_admin_sidebar_menu_items()
         'badge'    => [],
     ]);
 
+   
+
     if (
         has_permission('customers', '', 'view')
         || (have_assigned_customers()
@@ -34,6 +36,8 @@ function app_init_admin_sidebar_menu_items()
         'icon'     => 'fa fa-balance-scale',
         'badge'    => [],
     ]);
+
+
 
     if ((has_permission('proposals', '', 'view') || has_permission('proposals', '', 'view_own'))
         || (staff_has_assigned_proposals() && get_option('allow_staff_view_proposals_assigned') == 1)

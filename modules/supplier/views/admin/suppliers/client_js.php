@@ -5,6 +5,7 @@
  */
 ?>
 <script>
+
 Dropzone.options.clientAttachmentsUpload = false;
 var customer_id = $('input[name="userid"]').val();
 $(function() {
@@ -73,6 +74,21 @@ $(function() {
                 do_share_file_contacts();
             }
         }, 200);
+    });
+
+    // Junaid code her
+    $('body').on('click', '.view-service', function() {
+        var service_id = $(this).data('id');
+        $.ajax({
+            method : 'POST',
+            url: admin_url +"supplier/service_view", 
+            data: {service_id: service_id},
+            success: function(result){
+                $("#service-modal-content").html(result);
+                $("#service_view_modal").modal('show');
+
+            }
+        });
     });
 
     $('.customer-form-submiter').on('click', function() {

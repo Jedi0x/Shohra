@@ -17,7 +17,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 * environments.
 *
 */
-define('APP_BASE_URL', 'http://localhost/shohra/');
+define('APP_BASE_URL', 'http://localhost/shohra_updated/');
 
 /*
 * --------------------------------------------------------------------------
@@ -50,7 +50,7 @@ define('APP_DB_PASSWORD', '');
 /**
  * The name of the database you want to connect to
  */
-define('APP_DB_NAME', 'shohra');
+define('APP_DB_NAME', 'shohra_updated');
 
 /**
  * @since  2.3.0

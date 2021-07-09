@@ -9,7 +9,7 @@
             <div class="_buttons">
               <?php if (has_permission('subscriptions', '', 'create')) { ?>
                 <?php if(isset($invoice)) { ?>
-                  <a href="<?php echo admin_url('services/products/offer/invoice'); ?>" class="btn btn-info pull-left display-block">
+                  <a href="<?php echo admin_url('services/products/create/invoice'); ?>" class="btn btn-info pull-left display-block">
                   <?php echo _l('stripe_new_product'); ?>
                 </a>
                 <?php } else {?>

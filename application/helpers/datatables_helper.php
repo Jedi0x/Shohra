@@ -221,6 +221,8 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
 
     $rResult = $CI->db->query($sQuery)->result_array();
 
+  
+
     $rResult = hooks()->apply_filters('datatables_sql_query_results', $rResult, [
         'table' => $sTable,
         'limit' => $sLimit,

@@ -224,9 +224,22 @@ class Download extends App_Controller
             }
 
             $path = get_upload_path_by_type('estimate_request') . $attachment->rel_id . '/' . $attachment->file_name;
-        } else {
+            // Junaid code here
+        }else if ($folder_indicator == 'service') {
+            $path = get_upload_path_by_type('service'). '/' . $attachmentid; 
+
+           
+        } 
+
+        else {
             die('folder not specified');
         }
+
+
+        
+
+
+
 
         $path = hooks()->apply_filters('download_file_path', $path, [
             'folder'       => $folder_indicator,

@@ -3636,9 +3636,5 @@ $lang['gantt_view_week'] = 'عرض الأسابيع';
 $lang['gantt_view_month'] = 'عرض الشهور';
 $lang['gantt_view_year'] = 'عرض السنوات';
 
-# Junaid Code here
-$lang['clients_edit_profile_bank_detail_heading'] = 'التفاصيل المصرفية';
-$lang['clients_edit_profile_account_holder_name'] = 'اسم صاحب الحساب المصرفي';
-$lang['clients_edit_profile_iban'] = 'رقم الآيبان';
-$lang['clients_edit_profile_bank_location'] = 'موقع';
-$lang['clients_edit_profile_save_bank_detail'] = 'تحديث تفاصيل البنك';
+
+$lang['facebook_account_connected'] = 'Facebook Business Account Connected';

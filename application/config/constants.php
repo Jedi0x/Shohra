@@ -202,4 +202,6 @@ define('APP_MODULES_PATH', FCPATH . 'modules/');
  */
 define('LIBSPATH', APPPATH . 'libraries/');
 
-defined('PRODUCT_IMAGE_UPLOAD')      OR define('PRODUCT_IMAGE_UPLOAD', 'uploads/products/'); 
+// Junaid code here
+
+defined('SERVICE_IMAGE_UPLOAD')      OR define('SERVICE_IMAGE_UPLOAD', 'uploads/services/');

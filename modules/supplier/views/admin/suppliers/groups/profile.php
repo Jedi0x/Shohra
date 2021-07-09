@@ -43,12 +43,20 @@
                   </li>
                   <?php hooks()->do_action('after_customer_admins_tab', $client); ?>
                <?php } ?>
-               <!-- Junaid code here -->
+
+               <!-- Junaid Code here -->
                <li role="presentation">
-                  <a href="#bank_info" aria-controls="bank_info" role="tab" data-toggle="tab">
-                     <?php echo _l('clients_edit_profile_bank_detail_heading'); ?>
-                  </a>
+                     <a href="#social_links" aria-controls="social_links" role="tab" data-toggle="tab">
+                        <?php echo _l('social_links'); ?>
+                     </a>
                </li>
+
+               <li role="presentation">
+                     <a href="#bank_details" aria-controls="bank_details" role="tab" data-toggle="tab">
+                        <?php echo _l('bank_details'); ?>
+                     </a>
+               </li>
+
             </ul>
          </div>
       </div>
@@ -155,9 +163,6 @@
                         </select>
                      </div>
                   <?php } ?>
-                  <?php $value = (isset($client) ? $client->instagram : ''); ?>
-                  <?php echo render_input('instagram', 'Instagram', $value); ?>
-                 
                </div>
                <div class="col-md-6">
                   <?php $value = (isset($client) ? $client->address : ''); ?>
@@ -173,13 +178,6 @@
                   $selected = (isset($client) ? $client->country : $customer_default_country);
                   echo render_select('country', $countries, array('country_id', array('short_name')), 'clients_country', $selected, array('data-none-selected-text' => _l('dropdown_non_selected_tex')));
                   ?>
-                  <?php $value = (isset($client) ? $client->facebook : ''); ?>
-                  <?php echo render_input('facebook', 'Facebook', $value); ?>
-                  <?php $value = (isset($client) ? $client->twitter : ''); ?>
-                  <?php echo render_input('twitter', 'Twitter', $value); ?>
-                   <?php $value = (isset($client) ? $client->snapchat : ''); ?>
-                  <?php echo render_input('snapchat', 'Snapchat', $value); ?>
-                  
                 
                </div>
             </div>
@@ -221,6 +219,60 @@
                </table>
             </div>
          <?php } ?>
+
+         <!-- Junaid code here -->
+
+
+         <div role="tabpanel" class="tab-pane" id="social_links">
+            <div class="row">
+               <div class="col-md-12">
+                     <div class="col-md-6">
+                        <?php $value = (isset($client) ? $client->fb_username : ''); ?>
+                        <?php echo render_input('fb_username', 'supplier_fb_page', $value); ?>
+                        <?php 
+
+                        if(isset($client)){
+                           if(!empty($client->fb_access_token) && !empty($client->fb_username)){
+                              echo '<a href="'.admin_url('supplier/disconnect_fb/').$client->userid.'" class="text-danger _delete">Disconnect Facebook Account.</a>';
+                           }
+                        }
+
+                        ?>
+
+                        <?php $value = (isset($client) ? $client->instagram_username : ''); ?>
+                        <?php echo render_input('instagram_username', 'supplier_instagram_username', $value); ?>
+                     </div>
+
+                     <div class="col-md-6">
+                        <?php $value = (isset($client) ? $client->twitter_username : ''); ?>
+                        <?php echo render_input('twitter_username', 'supplier_twitter_username', $value); ?>
+
+                        <?php $value = (isset($client) ? $client->snapchat_username : ''); ?>
+                        <?php echo render_input('snapchat_username', 'supplier_snapchat_username', $value); ?>
+                     </div>
+               </div>
+            </div>
+         </div>
+
+
+
+         <div role="tabpanel" class="tab-pane" id="bank_details">
+            <div class="row">
+               <div class="col-md-12">
+                     
+                        <?php $value = (isset($client) ? $client->account_holder_name : ''); ?>
+                        <?php echo render_input('account_holder_name', 'supplier_account_holder_name', $value); ?>
+
+                        <?php $value = (isset($client) ? $client->iban_number : ''); ?>
+                        <?php echo render_input('iban_number', 'supplier_iban_number', $value); ?>
+                     
+                        <?php $value = (isset($client) ? $client->bank_location : ''); ?>
+                        <?php echo render_textarea('bank_location', 'supplier_bank_location', $value); ?>
+                     
+               </div>
+            </div>
+         </div>
+
          <div role="tabpanel" class="tab-pane" id="billing_and_shipping">
             <div class="row">
                <div class="col-md-12">
@@ -278,32 +330,6 @@
                            </div>
                         </div>
                      <?php } ?>
-                  </div>
-               </div>
-            </div>
-         </div>
-
-
-         <!-- Junaid code here -->
-
-
-         <div role="tabpanel" class="tab-pane" id="bank_info">
-            <div class="row">
-               <div class="col-md-12">
-                  <div class="row">
-                     <div class="col-md-12 dsdas">
-                        <h4 class="no-mtop"><?php echo _l('clients_edit_profile_bank_detail_heading'); ?></h4>
-                        <hr />
-
-                        <?php $value = (isset($client) ? $client->account_holder_name : ''); ?>
-                        <?php echo render_input('account_holder_name', 'clients_edit_profile_account_holder_name', $value,'text'); ?>
-                        <?php $value = (isset($client) ? $client->iban_number : ''); ?>
-                        <?php echo render_input('iban_number', 'clients_edit_profile_iban', $value,'text'); ?>
-                        <?php $value = (isset($client) ? $client->bank_location : ''); ?>
-                        <?php echo render_textarea('bank_location', 'clients_edit_profile_bank_location', $value); ?>
-
-                     </div>
-         
                   </div>
                </div>
             </div>

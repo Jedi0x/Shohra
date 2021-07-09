@@ -116,7 +116,7 @@ function get_customer_profile_tabs()
 // Junaid code here
 
 /**
- * Get predefined tabs array, used in customer profile
+ * Get predefined tabs array, used in supplier profile
  * @return array
  */
 function get_supplier_profile_tabs()
@@ -330,6 +330,7 @@ function app_init_customer_profile_tabs()
 }
 
 
+
 // Junaid code here
 
 function app_init_supplier_profile_tabs()
@@ -403,14 +404,20 @@ function app_init_supplier_profile_tabs()
         'position' => 30,
     ]);
 
-   
-
     $CI->app_tabs->add_supplier_profile_tab('credit_notes', [
         'name'     => _l('credit_notes'),
         'icon'     => 'fa fa-sticky-note-o',
         'view'     => 'admin/suppliers/groups/credit_notes',
         'visible'  => (has_permission('credit_notes', '', 'view') || has_permission('credit_notes', '', 'view_own')),
         'position' => 35,
+    ]);
+
+    $CI->app_tabs->add_supplier_profile_tab('tickets', [
+        'name'     => _l('tickets'),
+        'icon'     => 'fa fa-ticket',
+        'view'     => 'admin/suppliers/groups/tickets',
+        'visible'  => ((get_option('access_tickets_to_none_staff_members') == 1 && !is_staff_member()) || is_staff_member()),
+        'position' => 40,
     ]);
 
 }
@@ -1298,7 +1305,6 @@ function get_contact_language()
 
     return '';
 }
-
 
 // Junaid Code here
 

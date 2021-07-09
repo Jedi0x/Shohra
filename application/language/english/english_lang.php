@@ -3757,14 +3757,54 @@ $lang['task_checklist_assign']                        = 'Assign staff';
 $lang['task_checklist_assigned']                      = 'Assigned to %s';
 
 
-# Junaid Code here
+// Junaid code here
 
-$lang['clients_edit_profile_bank_detail_heading'] = 'Bank Details';
-$lang['clients_edit_profile_account_holder_name'] = 'Bank Account Holder Name';
-$lang['clients_edit_profile_iban'] = 'IBAN Number';
-$lang['clients_edit_profile_bank_location'] = 'Location';
-$lang['clients_edit_profile_save_bank_detail'] = 'Update Bank Details';
-$lang['bank_deatil_update'] = 'Bank Details Updated';
-$lang['something_went_wrong'] = 'Something Went Wrong';
-
+$lang['social_links'] = 'Social Links';
+$lang['supplier_fb_page'] = 'Facebook Page';
+$lang['supplier_instagram_username'] = 'Instagram Profile';
+$lang['supplier_twitter_username'] = 'Twitter Profile';
+$lang['supplier_snapchat_username'] = 'Snapchat Username';
+$lang['bank_details'] = 'Bank Details';
+$lang['supplier_account_holder_name'] = 'Bank Account Holder Name';
+$lang['supplier_iban_number'] = 'IBAN Number';
+$lang['supplier_bank_location'] = 'Bank location';
+$lang['supplier_product_and_service'] = 'Services';
+$lang['supplier_new_service'] = 'New Service';
+$lang['offer_add_heading'] = 'Add New Service';
+$lang['offer_video_time'] = 'Video Time';
+$lang['offer_video_number'] = 'Number of Videos';
+$lang['offer_embed_link'] = 'Embed Link';
+$lang['publish_service'] = 'Publish Service';
+$lang['featured_service'] = 'Featured Service';
+$lang['service'] = 'Service';
+$lang['publish_status'] = 'Publish';
+$lang['featured_status'] = 'Featured';
+$lang['supplier_edit_service'] = 'Edit Service';
+$lang['featured'] = 'Featured';
+$lang['not_featured'] = 'Not Featured';
 $lang['attachment_deleted'] = 'Attachment Deleted';
+$lang['bank_deatil_update'] = 'Bank Details Updated';
+$lang['orders'] = 'Orders';
+$lang['facebook_account_connected'] = 'Facebook Business Account Connected';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';

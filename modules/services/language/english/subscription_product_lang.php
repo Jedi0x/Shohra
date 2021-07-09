@@ -61,6 +61,3 @@ $lang['hide_invoice_subcription_group_from_client_side'] = 'Hide Invoice and Sub
 $lang['group'] = 'Group';
 $lang['login_first'] = 'Please Login First';
 $lang['stripe_product_added_successfully'] = 'Stripe Subscription product Added';
-$lang['new_offer'] = 'New Offer';
-$lang['supplier_offer'] = 'Supplier Offer';
-$lang['embed_video_link'] = 'Embed Video Link';

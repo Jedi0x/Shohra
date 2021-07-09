@@ -291,7 +291,7 @@ function get_company_logo($uri = '', $href_class = '', $type = '')
     $company_name = get_option('companyname');
 
     if ($uri == '') {
-        $logoURL = site_url();
+        $logoURL = site_url('clients');
     } else {
         $logoURL = site_url($uri);
     }

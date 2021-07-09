@@ -2,15 +2,17 @@
 <ul class="nav navbar-pills navbar-pills-flat nav-tabs nav-stacked customer-tabs" role="tablist">
   <?php
 
-  // Junaid code here
+ // Junaid code here
   if(isset($client) && $client->is_supplier == 1){
     $customer_tabs = $supplier_tabs;
-    $mysupplier = 7;
+    $mysupplier = 8;
   }else{
     $mysupplier = 20;
   }
 
-  $countsupplier = 1;
+ $countsupplier = 1;
+
+
   foreach(filter_client_visible_tabs($customer_tabs) as $key => $tab){
 
     if($countsupplier <= $mysupplier){

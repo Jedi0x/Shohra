@@ -68,26 +68,68 @@
 
 						<!-- Junaid code here -->
 
+						<?php 
+						if($client_info->is_supplier == 1){ 
+
+							$disable_fb = false;
+							$disable_instagram = false;
+							$disable_snapchat = false;
+							$disable_twitter = false;
+
+							if(!empty($client_info->fb_username)){
+								$disable_fb = true;
+							}
+							if(!empty($client_info->instagram_username)){
+								$disable_instagram = true;
+							}
+							if(!empty($client_info->snapchat_username)){
+								$disable_snapchat = true;
+							}
+							if(!empty($client_info->twitter_username)){
+								$disable_twitter = true;
+							}
+
+						?>
+
+						
 
 						<div class="form-group profile-phone-group">
-							<label for="snapchat"><?php echo _l('Snapchat Username'); ?></label>
-							<input type="text" class="form-control" name="snapchat" id="snapchat" value="<?php echo $client_info->snapchat; ?>">
+							<label for="instagram_username"><?php echo _l('supplier_instagram_username'); ?></label>
+							<input type="text" class="form-control" name="instagram_username" id="instagram_username" <?= (($disable_instagram) ? 'disabled' : ''); ?> value="<?php echo $client_info->instagram_username; ?>">
 						</div>
 
 						<div class="form-group profile-phone-group">
-							<label for="twitter"><?php echo _l('Twitter Username'); ?></label>
-							<input type="text" class="form-control" name="twitter" id="twitter" value="<?php echo $client_info->twitter; ?>">
+							<label for="snapchat_username"><?php echo _l('supplier_snapchat_username'); ?></label>
+							<input type="text" class="form-control" name="snapchat_username" id="snapchat_username" <?= (($disable_snapchat) ? 'disabled' : ''); ?> value="<?php echo $client_info->snapchat_username; ?>">
 						</div>
 
 						<div class="form-group profile-phone-group">
-							<label for="facebook"><?php echo _l('Facebook Page'); ?></label>
-							<input type="text" class="form-control" name="facebook" id="facebook" value="<?php echo $client_info->facebook; ?>">
+							<label for="twitter_username"><?php echo _l('supplier_twitter_username'); ?></label>
+							<input type="text" class="form-control" name="twitter_username" id="twitter_username" <?= (($disable_twitter) ? 'disabled' : ''); ?> value="<?php echo $client_info->twitter_username; ?>">
 						</div>
 
+						<?php if(empty($client_info->fb_access_token) && empty($client_info->fb_username)){ ?>
+						<a href="<?=base_url('fb');?>">Connect Facebook Business Account</a><br>
+						<?php }else{ ?>
+						
 						<div class="form-group profile-phone-group">
-							<label for="instagram"><?php echo _l('Instagram Username'); ?></label>
-							<input type="text" class="form-control" name="instagram" id="instagram" value="<?php echo $client_info->instagram; ?>">
+							<label for="fb_username"><?php echo _l('supplier_fb_page'); ?></label>
+							<input type="text" class="form-control" name="fb_username" id="fb_username" disabled  value="<?php echo $client_info->fb_username; ?>">
 						</div>
+
+						<?php } ?>
+
+
+						<?php if($disable_twitter || $disable_snapchat || $disable_instagram || $disable_fb){
+							$url = base_url('clients/tickets');
+
+							echo 'Request to Change Social Links <a href="'.$url.'">Click Here</a>';
+
+						} ?>
+
+						<?php } ?>
+
+
 						<?php echo render_custom_fields( 'contacts',get_contact_user_id(),array('show_on_client_portal'=>1)); ?>
 						<?php if(can_contact_view_email_notifications_options()){ ?>
 							<hr />
@@ -189,7 +231,7 @@
 	<div class="col-md-4 contact-profile-change-password-section">
 		<div class="panel_s section-heading section-change-password">
 			<div class="panel-body">
-				<h4 class="no-margin section-text"><?php echo _l('clients_edit_profile_bank_detail_heading'); ?></h4>
+				<h4 class="no-margin section-text"><?php echo _l('bank_details'); ?></h4>
 			</div>
 		</div>
 		<div class="panel_s">
@@ -197,22 +239,22 @@
 				<?php echo form_open('clients/profile'); ?>
 				<?php echo form_hidden('bank_details',true); ?>
 				<div class="form-group">
-					<label for="account_holder_name"><?php echo _l('clients_edit_profile_account_holder_name'); ?></label>
+					<label for="account_holder_name"><?php echo _l('supplier_account_holder_name'); ?></label>
 					<input type="text" class="form-control" name="account_holder_name" id="account_holder_name" value="<?php echo set_value('account_holder_name',$client->account_holder_name); ?>">
 					<?php echo form_error('account_holder_name'); ?>
 				</div>
 				<div class="form-group">
-					<label for="iban_number"><?php echo _l('clients_edit_profile_iban'); ?></label>
+					<label for="iban_number"><?php echo _l('supplier_iban_number'); ?></label>
 					<input type="text" class="form-control" name="iban_number" id="iban_number" value="<?php echo set_value('iban_number',$client->iban_number); ?>">
 					<?php echo form_error('iban_number'); ?>
 				</div>
 				<div class="form-group">
-					<label for="bank_location"><?php echo _l('clients_edit_profile_bank_location'); ?></label>
+					<label for="bank_location"><?php echo _l('supplier_bank_location'); ?></label>
 					<textarea rows="3" class="form-control" name="bank_location" id="bank_location"><?php echo set_value('bank_location',$client->bank_location); ?></textarea>
 					<?php echo form_error('bank_location'); ?>
 				</div>
 				<div class="form-group">
-					<button type="submit" class="btn btn-info btn-block"><?php echo _l('clients_edit_profile_save_bank_detail'); ?></button>
+					<button type="submit" class="btn btn-info btn-block"><?php echo _l('save'); ?></button>
 				</div>
 				<?php echo form_close(); ?>
 			</div>
